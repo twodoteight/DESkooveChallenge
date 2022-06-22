@@ -11,11 +11,11 @@ P.S. The server code provided for the challenge returns false for every request,
 
 I had to change the line:
 ```javascript
-getRandomInt(1) === 1 // Changed this bit, it was 1
+getRandomInt(1) === 1
 ```
 to:
 ```javascript
-getRandomInt(2) // Changed this bit, it was 1
+getRandomInt(2)
 ```
 In the function:
 ```javascript
