@@ -51,6 +51,7 @@ class ViewModel: NSObject, ObservableObject {
     func fetchNextScreen() {
         // Check if a previouslt fethed result is persisted in UserDefaults.
         if let data = UserDefaults.standard.object(forKey: "fetchedScreen") {
+            print("Fetching screen type from cache")
             nextBScreen = ScreenType(rawValue: data as? String ?? "")
             return
         }

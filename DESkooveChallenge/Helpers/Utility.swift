@@ -14,3 +14,14 @@ extension Color {
     static let screenC = Color("ScreenC")
     static let screenD = Color("ScreenD")
 }
+
+extension Binding {
+    func onChange(_ handler: @escaping (Value) -> Void) -> Binding<Value> {
+        return Binding(
+            get: { self.wrappedValue },
+            set: { selection in
+                self.wrappedValue = selection
+                handler(selection)
+        })
+    }
+}
