@@ -7,72 +7,73 @@
 
 import Foundation
 
-class APIRequest {
+protocol APIRequestProtocol {
+    func perform(completion: @escaping (Result<Data, Error>) -> Void)
+}
+
+final class APIRequest: APIRequestProtocol {
     
-    enum ApiError: Error {
+    enum APIError: Error {
         case invalidData
-        case httpError(errorCode: Int)
-        case decodingError
+        case failedRequest(errorCode: Int)
+        case noResponse
     }
     
     let url: URL
+    let requestType: String
     
-    init(url: URL) {
+    init(requestType:String, url: URL) {
+        self.requestType = requestType
         self.url = url
     }
     
-    // Simple resuable generic function for api GET calls.
-    func perform<T: Decodable>(expecting: T.Type, completion: @escaping (Result<T?, Error>) -> Void) {
-        
+    func perform(completion: @escaping (Result<Data, Error>) -> Void) {
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        request.httpMethod = requestType
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data else {
                 if let error = error {
                     completion(.failure(error))
                 } else {
-                    completion(.failure(ApiError.invalidData))
+                    completion(.failure(APIError.invalidData))
                 }
                 return
             }
             
-            if let response = response as? HTTPURLResponse {
-                if response.statusCode == 200 {
-                    do {
-                        let decoder = JSONDecoder()
-                        decoder.dateDecodingStrategy = .secondsSince1970
-                        let result = try decoder.decode(expecting, from: data)
-                        completion(.success(result))
-                    } catch {
-                        completion(.failure(ApiError.decodingError))
-                    }
-                } else {
-                    completion(.failure(ApiError.httpError(errorCode: response.statusCode)))
-                }
+            guard let response = response as? HTTPURLResponse else {
+                completion(.failure(APIError.noResponse))
+                return
+            }
+            
+            if response.statusCode == 200 {
+                completion(.success(data))
+            } else {
+                print("Server returned error: \(response.statusCode) - (\(HTTPURLResponse.localizedString(forStatusCode: response.statusCode)))")
+                completion(.failure(APIError.failedRequest(errorCode: response.statusCode)))
             }
         }
         task.resume()
     }
     
-    // Slightly different version to mimic the submit behaviour. Potentially, this could be a POST request.
-    func submit(with completion: @escaping (Result<HTTPURLResponse, Error>) -> Void) {
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            
-            if let response = response as? HTTPURLResponse {
-                if response.statusCode == 200 {
-                    completion(.success(response))
-                } else {
-                    print("Server returned error: \(response.statusCode) - (\(HTTPURLResponse.localizedString(forStatusCode: response.statusCode)))")
-                    completion(.failure(ApiError.httpError(errorCode: response.statusCode)))
-                }
-            }
-        }
-        task.resume()
-    }
+    //    // Slightly different version to mimic the submit behaviour. Realistically, this would be a POST request.
+    //    func perform(with completion: @escaping (Result<HTTPURLResponse, Error>) -> Void) {
+    //
+    //        var request = URLRequest(url: url)
+    //        request.httpMethod = "GET"
+    //
+    //        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+    //
+    //            if let response = response as? HTTPURLResponse {
+    //                if response.statusCode == 200 {
+    //                    completion(.success(response))
+    //                } else {
+    //                    print("Server returned error: \(response.statusCode) - (\(HTTPURLResponse.localizedString(forStatusCode: response.statusCode)))")
+    //                    completion(.failure(APIError.httpError(errorCode: response.statusCode)))
+    //                }
+    //            }
+    //        }
+    //        task.resume()
+    //    }
 }
 

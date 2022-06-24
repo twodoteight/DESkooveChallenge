@@ -20,42 +20,37 @@ struct ScreenBView: View {
         VStack {
             Spacer()
             Group {
-                switch viewModel.nextBScreen {
+                switch viewModel.bScreen {
                 case .screenB1:
                     B1View(choices: viewModel.choices, selection: $selection).onAppear() {
                         print("Screen B1 appeared")
                     }
-                    NavigationLink(destination: ScreenCView(titleText: selection, type: .screenC1), isActive: $viewModel.isSelectionSubmitted) {
-                        EmptyView()
-                    }
                 case .screenB2:
                     B2View(options: viewModel.options,
-                           selection: $selection,
-                           flags: Array(repeating: false, count: viewModel.options.count)).onAppear() {
+                           selection: $selection).onAppear() {
                         print("Screen B2 appeared")
-                    }
-                    NavigationLink(destination: ScreenCView(titleText: selection, type: .screenC2), isActive: $viewModel.isSelectionSubmitted) {
-                        EmptyView()
                     }
                 case .screenB3:
                     B3View().onAppear() {
                         print("Screen B3 appeared")
                     }
-                    NavigationLink(destination: ScreenCView(type: .screenC2), isActive: $canSkipSubmit) {
-                        EmptyView()
-                    }
+
                 default:
                     Text("Invalid Fetched Screen").onAppear() {
                         print("Invalid Fetched Screen")
                     }
                 }
+                
+                NavigationLink(destination: ScreenCView(titleText: selection, type: viewModel.cScreen ?? .screenC2), isActive: $viewModel.isSelectionSubmitted) {
+                    EmptyView()
+                }
             }
-            .navigationTitle(viewModel.nextBScreen?.rawValue ?? "No B Screen")
+            .navigationTitle(viewModel.bScreen?.rawValue ?? "No B Screen")
             .onAppear(perform: setup)
             
             Spacer()
             Button {
-                viewModel.nextBScreen == .screenB3 ? canSkipSubmit = true : viewModel.submitSelection()
+                viewModel.submitSelection()
             } label: {
                 Image(systemName: "chevron.forward")
                     .resizable()
@@ -71,7 +66,7 @@ struct ScreenBView: View {
     }
     
     func setup() {
-        switch viewModel.nextBScreen {
+        switch viewModel.bScreen {
         case .screenB1:
             bgColor = Color.screenB
         case .screenB2:
@@ -112,10 +107,16 @@ struct B1View: View {
 
 
 struct B2View: View {
-    var options: [String]
+    private var options: [String]
     
     @Binding var selection: String
     @State var flags: [Bool]
+    
+    init(options: [String], selection: Binding<String>) {
+        self.options = options
+        self._selection = selection
+        self._flags = State(initialValue: Array(repeating: false, count: options.count))
+    }
     
     var body: some View {
         VStack (alignment: .leading, spacing: 10) {
@@ -125,7 +126,7 @@ struct B2View: View {
                     .toggleStyle(.checkboxToggle)
             }
         }.onAppear(){
-            selection = options[0]
+            flags = flags.map { _ in false }
             flags[0] = true
         }
     }

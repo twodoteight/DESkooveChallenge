@@ -23,7 +23,7 @@ struct ScreenAView: View {
                     .font(.system(size:20))
                     .foregroundColor(.black)
                     .onAppear {
-                        viewModel.fetchNextScreen()
+                        viewModel.fetchBScreen()
                     }
                 // Temporary controls for debugging and testing.
 //                VStack {
@@ -33,7 +33,7 @@ struct ScreenAView: View {
 //                VStack {
 //
 //                    Button("Start fetching") {
-//                        viewModel.fetchNextScreen()
+//                        viewModel.fetchBScreen()
 //                    }
 //                    .buttonStyle(.borderedProminent)
 //                    .foregroundColor(Color.black)
@@ -42,19 +42,19 @@ struct ScreenAView: View {
 //
 //                    Group {
 //                        Button("Select B1"){
-//                            viewModel.nextBScreen = .screenB1
+//                            viewModel.bScreen = .screenB1
 //                        }
 //
 //                        Button("Select B2"){
-//                            viewModel.nextBScreen = .screenB2
+//                            viewModel.bScreen = .screenB2
 //                        }
 //
 //                        Button("Select B3"){
-//                            viewModel.nextBScreen = .screenB3
+//                            viewModel.bScreen = .screenB3
 //                        }
 //
 //                        Button("Select No View"){
-//                            viewModel.nextBScreen = .noScreenB
+//                            viewModel.bScreen = .noScreenB
 //                        }
 //
 //                    }
@@ -70,16 +70,16 @@ struct ScreenAView: View {
             .background(Color.screenA)
             .ignoresSafeArea()
             
-            NavigationLink(destination: ScreenBView().navigationBarBackButtonHidden(!canComeBack), tag: ScreenType.screenB1, selection: $viewModel.nextBScreen) {
+            NavigationLink(destination: ScreenBView().navigationBarBackButtonHidden(!canComeBack), tag: ScreenType.screenB1, selection: $viewModel.bScreen) {
                 EmptyView()
             }
-            NavigationLink(destination: ScreenBView().navigationBarBackButtonHidden(!canComeBack), tag: ScreenType.screenB2, selection: $viewModel.nextBScreen) {
+            NavigationLink(destination: ScreenBView().navigationBarBackButtonHidden(!canComeBack), tag: ScreenType.screenB2, selection: $viewModel.bScreen) {
                 EmptyView()
             }
-            NavigationLink(destination: ScreenBView().navigationBarBackButtonHidden(!canComeBack), tag: ScreenType.screenB3, selection: $viewModel.nextBScreen) {
+            NavigationLink(destination: ScreenBView().navigationBarBackButtonHidden(!canComeBack), tag: ScreenType.screenB3, selection: $viewModel.bScreen) {
                 EmptyView()
             }
-            NavigationLink(destination: ScreenCView().navigationBarBackButtonHidden(!canComeBack), tag: ScreenType.noScreenB, selection: $viewModel.nextBScreen) {
+            NavigationLink(destination: ScreenCView().navigationBarBackButtonHidden(!canComeBack), tag: ScreenType.noScreenB, selection: $viewModel.bScreen) {
                 EmptyView()
             }
         }

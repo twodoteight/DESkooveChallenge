@@ -9,9 +9,13 @@ import XCTest
 @testable import DESkooveChallenge
 
 class DESkooveChallengeTests: XCTestCase {
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    
+    var viewModel: ViewModel!
+    var mockService: MockChallengeService!
+    
+    override func setUp() {
+        mockService = MockChallengeService()
+        viewModel = .init(service: mockService)
     }
 
     override func tearDownWithError() throws {
@@ -32,5 +36,4 @@ class DESkooveChallengeTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
-
 }
