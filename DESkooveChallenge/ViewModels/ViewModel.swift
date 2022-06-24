@@ -11,13 +11,20 @@ import SwiftUI
 class ViewModel: NSObject, ObservableObject {
     @Published var bScreen: ScreenType? = nil
     @Published var cScreen: ScreenType? = nil
+    
     @Published var isSelectionSubmitted: Bool = false
     @Published var isLoginSuccesful: Bool = false
+    @Published var hasTimeElapsed: Bool = false
+
+    @Published var canProceedToC: Bool = false
+    @Published var canProceedToD: Bool = false
     
     // Hard coded lists for options. Ideally,
     // these would be represented by suitable models but done this way for convenience.
     let choices = ["Choice A", "Choice B", "Choice C", "Choice D", "Choice E"]
     let options = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5"]
+    
+    var loginTries = 0
     
     private let service: ChallengeServiceProtocol
     private var sessionID: String?
@@ -28,13 +35,13 @@ class ViewModel: NSObject, ObservableObject {
     
     // Function that strats the atempts to login. Retries are done recursively.
     func attemptLogIn(maxTries: Int = 20) {
-        
         print("Remaining Attempts: \(maxTries)")
         if maxTries == 0 {
             print("Login Failed")
             return
         }
-        
+        loginTries += 1
+
         // Could be enum cases
         let endpoint = "rLogin"
         
@@ -42,10 +49,8 @@ class ViewModel: NSObject, ObservableObject {
             switch result {
             case .success(let session):
                 print("Login Success! ID: \(session!.sessionID)")
-                DispatchQueue.main.async {
                     self?.isLoginSuccesful = true
                     self?.sessionID = session!.sessionID
-                }
             case .failure(let error):
                 print("Login Failure! \(error.localizedDescription)")
                 self?.attemptLogIn(maxTries: maxTries - 1)
@@ -57,22 +62,21 @@ class ViewModel: NSObject, ObservableObject {
     func fetchBScreen() {
         // Check if a previouslt fethed result is persisted in UserDefaults.
         // Could be done within the ChallengeService class
-//        if let data = UserDefaults.standard.object(forKey: "rFetchExperiments") {
-//            print("Fetching screen type from cache")
-//            bScreen = ScreenType(rawValue: data as? String ?? "")
-//            return
-//        }
+        if let data = UserDefaults.standard.object(forKey: "rFetchExperiments") {
+            print("Fetching screen type from cache")
+            bScreen = ScreenType(rawValue: data as? String ?? "")
+            return
+        }
             
         let endpoint = "rFetchExperiments"
         
         service.get(from: endpoint) { [weak self] (result: Result<ScreenType?, Error>) in
             switch result {
             case .success(let screenType):
-                DispatchQueue.main.async {
                     UserDefaults.standard.set(screenType!.rawValue, forKey: "rFetchExperiments")
                     self?.bScreen = screenType!
                     self?.fetchCScreen()
-                }
+                
             case .failure(let error):
                 print("Could not get the next screen! \(error.localizedDescription)")
             }
@@ -82,17 +86,18 @@ class ViewModel: NSObject, ObservableObject {
     // Function that mocks the submit logic.
     func submitSelection() {
         if let bScreen = bScreen, bScreen == .screenB3 {
-            isSelectionSubmitted = true
+            print("No submission needed!")
+            canProceedToC = true
+            return
         }
         
         let endpoint = "rSubmitSelection"
         service.submit(to: endpoint) { [weak self] (result: Result<String, Error>) in
             switch result {
             case .success(let response):
-                DispatchQueue.main.async {
                     print(response)
+                    self?.canProceedToC = true
                     self?.isSelectionSubmitted = true
-                }
             case .failure(let error):
                 print("Could not submit! \(error.localizedDescription)")
             }

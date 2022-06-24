@@ -10,6 +10,7 @@
 		0C7A5EB728656DCA007A9B23 /* MockChallengeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A5EB628656DCA007A9B23 /* MockChallengeService.swift */; };
 		0C7A5EB928656F4D007A9B23 /* APIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A5EB828656F4D007A9B23 /* APIRequest.swift */; };
 		0C7A5EBB28656F6D007A9B23 /* ChallengeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A5EBA28656F6D007A9B23 /* ChallengeService.swift */; };
+		0C7A5EBD28660110007A9B23 /* ViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A5EBC28660110007A9B23 /* ViewModelTests.swift */; };
 		0C8D939928640976008206FE /* ViewStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8D939828640976008206FE /* ViewStyles.swift */; };
 		0CD51F43285DDBB50044F4DA /* DESkooveChallengeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD51F42285DDBB50044F4DA /* DESkooveChallengeApp.swift */; };
 		0CD51F45285DDBB50044F4DA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD51F44285DDBB50044F4DA /* ContentView.swift */; };
@@ -50,6 +51,7 @@
 		0C7A5EB628656DCA007A9B23 /* MockChallengeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockChallengeService.swift; sourceTree = "<group>"; };
 		0C7A5EB828656F4D007A9B23 /* APIRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIRequest.swift; sourceTree = "<group>"; };
 		0C7A5EBA28656F6D007A9B23 /* ChallengeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeService.swift; sourceTree = "<group>"; };
+		0C7A5EBC28660110007A9B23 /* ViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelTests.swift; sourceTree = "<group>"; };
 		0C8D939828640976008206FE /* ViewStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStyles.swift; sourceTree = "<group>"; };
 		0CD51F3F285DDBB50044F4DA /* DESkooveChallenge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DESkooveChallenge.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CD51F42285DDBB50044F4DA /* DESkooveChallengeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DESkooveChallengeApp.swift; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				0CD51F53285DDBB90044F4DA /* DESkooveChallengeTests.swift */,
+				0C7A5EBC28660110007A9B23 /* ViewModelTests.swift */,
 				0C7A5EB628656DCA007A9B23 /* MockChallengeService.swift */,
 			);
 			path = DESkooveChallengeTests;
@@ -359,6 +362,7 @@
 			files = (
 				0CD51F54285DDBB90044F4DA /* DESkooveChallengeTests.swift in Sources */,
 				0C7A5EB728656DCA007A9B23 /* MockChallengeService.swift in Sources */,
+				0C7A5EBD28660110007A9B23 /* ViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

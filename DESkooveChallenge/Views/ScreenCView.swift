@@ -11,10 +11,7 @@ struct ScreenCView: View {
     var titleText: String = ""
     @EnvironmentObject var viewModel: ViewModel
     @State var type: ScreenType = .screenC2
-    
     @State private var colorOpacity: Double = 1
-    @State private var canProceed: Bool = false
-    @State private var hasTimeElapsed: Bool = false
     
     var body: some View {
         Group {
@@ -44,7 +41,7 @@ struct ScreenCView: View {
                     .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
                     .offset(y: -50)
                 
-                NavigationLink(destination: ScreenDView(), isActive: $canProceed) {
+                NavigationLink(destination: ScreenDView(), isActive: $viewModel.canProceedToD) {
                     EmptyView()
                 }
             }
@@ -58,7 +55,7 @@ struct ScreenCView: View {
             wait(until: .now() + 3)
         }
         .onChange(of: viewModel.isLoginSuccesful, perform: updateStatus)
-        .onChange(of: hasTimeElapsed, perform: updateStatus)
+        .onChange(of: viewModel.hasTimeElapsed, perform: updateStatus)
     }
     
     func pickColor() {
@@ -74,14 +71,14 @@ struct ScreenCView: View {
     
     func wait(until time: DispatchTime) {
         DispatchQueue.main.asyncAfter(deadline: time) {
-            hasTimeElapsed = true
+            viewModel.hasTimeElapsed = true
             // Print to check if it works
             print("3 Seconds elapsed")
         }
     }
     
     func updateStatus(newValue: Bool) {
-        canProceed = viewModel.isLoginSuccesful && hasTimeElapsed
+        viewModel.canProceedToD = viewModel.isLoginSuccesful && viewModel.hasTimeElapsed
     }
 }
 

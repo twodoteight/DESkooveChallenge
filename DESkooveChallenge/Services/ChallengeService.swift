@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 protocol ChallengeServiceProtocol {
     func get<T>(from endpoint: String, completion: @escaping (Result<T?, Error>) -> Void) where T: Decodable
@@ -30,33 +31,37 @@ final class ChallengeService: ChallengeServiceProtocol {
         let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
         
         APIRequest(requestType: "GET", url: url).perform() { result in
-            switch result {
-            case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    decoder.dateDecodingStrategy = .secondsSince1970
-                    let result = try decoder.decode(T.self, from: data)
-                    completion(.success(result))
-                } catch {
-                    completion(.failure(ServiceError.decodingFailed))
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let data):
+                    do {
+                        let decoder = JSONDecoder()
+                        decoder.dateDecodingStrategy = .secondsSince1970
+                        let result = try decoder.decode(T.self, from: data)
+                        completion(.success(result))
+                    } catch {
+                        completion(.failure(ServiceError.decodingFailed))
+                    }
+                case .failure(let error):
+                    completion(.failure(error))
                 }
-            case .failure(let error):
-                completion(.failure(error))
             }
         }
     }
-
+    
     // Slightly different version to mimic the submit behaviour. Realistically, this would be a POST request.
     func submit(to endpoint: String, completion: @escaping (Result<String, Error>) -> Void) {
         let urlString = baseUrl + endpoint
         let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
         
         APIRequest(requestType: "GET", url: url).perform() { result in
-            switch result {
-            case .success(_):
-                completion(.success("200"))
-            case .failure(let error):
-                completion(.failure(error))
+            DispatchQueue.main.async {
+                switch result {
+                case .success(_):
+                    completion(.success("200"))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
             }
         }
     }

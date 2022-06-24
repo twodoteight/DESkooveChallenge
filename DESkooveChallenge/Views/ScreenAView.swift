@@ -70,6 +70,7 @@ struct ScreenAView: View {
             .background(Color.screenA)
             .ignoresSafeArea()
             
+            
             NavigationLink(destination: ScreenBView().navigationBarBackButtonHidden(!canComeBack), tag: ScreenType.screenB1, selection: $viewModel.bScreen) {
                 EmptyView()
             }

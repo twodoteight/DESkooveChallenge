@@ -41,7 +41,7 @@ struct ScreenBView: View {
                     }
                 }
                 
-                NavigationLink(destination: ScreenCView(titleText: selection, type: viewModel.cScreen ?? .screenC2), isActive: $viewModel.isSelectionSubmitted) {
+                NavigationLink(destination: ScreenCView(titleText: selection, type: viewModel.cScreen ?? .screenC2), isActive: $viewModel.canProceedToC) {
                     EmptyView()
                 }
             }
@@ -128,6 +128,7 @@ struct B2View: View {
         }.onAppear(){
             flags = flags.map { _ in false }
             flags[0] = true
+            selection = options[0]
         }
     }
     func checklistChanged(newValue: [Bool]) {
