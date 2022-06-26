@@ -25,7 +25,7 @@ class ViewModel: NSObject, ObservableObject {
     let options = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5"]
     
     var loginTries: Int = 0
-    var cacheBScreen: Bool = false
+    var cacheBScreen: Bool = true
     
     private let service: ChallengeServiceProtocol
     private var sessionID: String?

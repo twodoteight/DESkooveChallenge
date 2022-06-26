@@ -36,6 +36,9 @@ class ViewModelTests: XCTestCase {
     }
     
     func test_FirstSuccessfullyFetchedBScreenIsCached() {
+        // Assert default behaviour is caching
+        XCTAssertTrue(viewModel.cacheBScreen)
+
         let domain = Bundle.main.bundleIdentifier!
         UserDefaults.standard.removePersistentDomain(forName: domain)
         
