@@ -24,7 +24,8 @@ class ViewModel: NSObject, ObservableObject {
     let choices = ["Choice A", "Choice B", "Choice C", "Choice D", "Choice E"]
     let options = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5"]
     
-    var loginTries = 0
+    var loginTries: Int = 0
+    var cacheBScreen: Bool = false
     
     private let service: ChallengeServiceProtocol
     private var sessionID: String?
@@ -44,13 +45,12 @@ class ViewModel: NSObject, ObservableObject {
 
         // Could be enum cases
         let endpoint = "rLogin"
-        
-        service.get(from: endpoint) {[weak self] (result: Result<Session?, Error>) in
+        service.login(from: endpoint) {[weak self] (result: Result<Session, Error>) in
             switch result {
             case .success(let session):
-                print("Login Success! ID: \(session!.sessionID)")
+                print("Login Success! ID: \(session.sessionID)")
                     self?.isLoginSuccesful = true
-                    self?.sessionID = session!.sessionID
+                    self?.sessionID = session.sessionID
             case .failure(let error):
                 print("Login Failure! \(error.localizedDescription)")
                 self?.attemptLogIn(maxTries: maxTries - 1)
@@ -62,21 +62,17 @@ class ViewModel: NSObject, ObservableObject {
     func fetchBScreen() {
         // Check if a previouslt fethed result is persisted in UserDefaults.
         // Could be done within the ChallengeService class
-        if let data = UserDefaults.standard.object(forKey: "rFetchExperiments") {
-            print("Fetching screen type from cache")
-            bScreen = ScreenType(rawValue: data as? String ?? "")
+        if cacheBScreen == true, let cachedScreen = getBScreenFromCache() {
+            setBScreen(screenType: cachedScreen)
             return
         }
             
         let endpoint = "rFetchExperiments"
-        
-        service.get(from: endpoint) { [weak self] (result: Result<ScreenType?, Error>) in
+        service.getBScreen(from: endpoint) { [weak self] (result: Result<ScreenType, Error>) in
             switch result {
             case .success(let screenType):
-                    UserDefaults.standard.set(screenType!.rawValue, forKey: "rFetchExperiments")
-                    self?.bScreen = screenType!
-                    self?.fetchCScreen()
-                
+                    UserDefaults.standard.set(screenType.rawValue, forKey: "rFetchExperiments")
+                    self?.setBScreen(screenType: screenType)
             case .failure(let error):
                 print("Could not get the next screen! \(error.localizedDescription)")
             }
@@ -104,12 +100,28 @@ class ViewModel: NSObject, ObservableObject {
         }
     }
     
+    func getBScreenFromCache() -> ScreenType? {
+        if let data = UserDefaults.standard.object(forKey: "rFetchExperiments") {
+            print("Fetched screen type from cache")
+            return ScreenType(rawValue: data as? String ?? "")
+        }
+        return nil
+    }
+    
+    func setBScreen(screenType: ScreenType) {
+        bScreen = screenType
+        fetchCScreen()
+    }
+    
     func fetchCScreen() {
         switch bScreen {
         case .screenB1:
             cScreen = .screenC1
-        case .screenB2, .screenB3, .noScreenB:
+        case .screenB2, .screenB3:
             cScreen = .screenC2
+        case .noScreenB:
+            cScreen = .screenC2
+            canProceedToC = true
         default:
             cScreen = .screenC2
         }

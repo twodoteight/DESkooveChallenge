@@ -27,32 +27,57 @@ class ViewModelTests: XCTestCase {
     func test_B3ScreenTypeSetsCanProceedToCTrueWithoutSubmitting() {
         XCTAssertFalse(viewModel.isSelectionSubmitted)
         XCTAssertFalse(viewModel.canProceedToC)
-        viewModel.bScreen = .screenB3
+        
+        viewModel.setBScreen(screenType: .screenB3)
         viewModel.submitSelection()
+        
         XCTAssertFalse(viewModel.isSelectionSubmitted)
         XCTAssertTrue(viewModel.canProceedToC)
     }
     
-    func test_SuccessfullyFetchedBScreenIsCached() {
+    func test_FirstSuccessfullyFetchedBScreenIsCached() {
         let domain = Bundle.main.bundleIdentifier!
         UserDefaults.standard.removePersistentDomain(forName: domain)
         
         var firstFetch: ScreenType?, secondFetch: ScreenType?
         
-        mockService.mockJson = "\"screenB1\""
+        mockService.getBResult = .success(ScreenType.screenB1)
         viewModel.fetchBScreen()
         firstFetch = self.viewModel.bScreen
         XCTAssertNotNil(firstFetch)
         
-        mockService.mockJson = "\"screenB2\""
+        mockService.getBResult = .success(ScreenType.screenB2)
         viewModel.fetchBScreen()
         secondFetch = self.viewModel.bScreen
         XCTAssertNotNil(secondFetch)
+        
         XCTAssertEqual(firstFetch, secondFetch)
     }
     
+    func test_SettingBScreenCorrectllySetsCScreen() {
+        
+        viewModel.cacheBScreen = false
+        
+        mockService.getBResult = .success(ScreenType.screenB1)
+        viewModel.fetchBScreen()
+        XCTAssertEqual(viewModel.cScreen, .screenC1)
+        
+        mockService.getBResult = .success(ScreenType.screenB2)
+        viewModel.fetchBScreen()
+        XCTAssertEqual(viewModel.cScreen, .screenC2)
+
+        mockService.getBResult = .success(ScreenType.screenB3)
+        viewModel.fetchBScreen()
+        XCTAssertEqual(viewModel.cScreen, .screenC2)
+
+
+        mockService.getBResult = .success(ScreenType.noScreenB)
+        viewModel.fetchBScreen()
+        XCTAssertEqual(viewModel.cScreen, .screenC2)
+    }
+    
     func test_LoginFailsAfterSpecifiedAmountOfRetries() {
-        mockService.shouldFail = true
+        mockService.loginResult = .failure(APIRequest.APIError.failedRequest(errorCode: 400))
         viewModel.attemptLogIn(maxTries: 20)
         XCTAssertEqual(viewModel.loginTries, 20)
     }

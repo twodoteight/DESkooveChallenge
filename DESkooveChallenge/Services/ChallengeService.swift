@@ -9,15 +9,13 @@ import Foundation
 import SwiftUI
 
 protocol ChallengeServiceProtocol {
-    func get<T>(from endpoint: String, completion: @escaping (Result<T?, Error>) -> Void) where T: Decodable
+    //func get<T>(from endpoint: String, completion: @escaping (Result<T?, Error>) -> Void) where T: Decodable
+    func login(from endpoint: String, completion: @escaping (Result<Session, Error>) -> Void)
+    func getBScreen(from endpoint: String, completion: @escaping (Result<ScreenType, Error>) -> Void)
     func submit(to endpoint: String, completion: @escaping (Result<String, Error>) -> Void)
 }
 
 final class ChallengeService: ChallengeServiceProtocol {
-    
-    enum ServiceError: Error {
-        case decodingFailed
-    }
     
     var baseUrl: String;
     
@@ -25,23 +23,15 @@ final class ChallengeService: ChallengeServiceProtocol {
         self.baseUrl = baseUrl
     }
     
-    // Simple, resuable generic function for get api calls.
-    func get<T>(from endpoint: String, completion: @escaping (Result<T?, Error>) -> Void) where T: Decodable {
+    func login(from endpoint: String, completion: @escaping (Result<Session, Error>) -> Void) {
         let urlString = baseUrl + endpoint
         let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
         
-        APIRequest(requestType: "GET", url: url).perform() { result in
+        APIRequest(requestType: "GET", url: url).perform() { (result: Result<Session, Error>)  in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let data):
-                    do {
-                        let decoder = JSONDecoder()
-                        decoder.dateDecodingStrategy = .secondsSince1970
-                        let result = try decoder.decode(T.self, from: data)
-                        completion(.success(result))
-                    } catch {
-                        completion(.failure(ServiceError.decodingFailed))
-                    }
+                case .success(let session):
+                    completion(.success(session))
                 case .failure(let error):
                     completion(.failure(error))
                 }
@@ -49,7 +39,22 @@ final class ChallengeService: ChallengeServiceProtocol {
         }
     }
     
-    // Slightly different version to mimic the submit behaviour. Realistically, this would be a POST request.
+    func getBScreen(from endpoint: String, completion: @escaping (Result<ScreenType, Error>) -> Void) {
+        let urlString = baseUrl + endpoint
+        let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
+        
+        APIRequest(requestType: "GET", url: url).perform() { (result: Result<ScreenType, Error>)  in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let screenType):
+                    completion(.success(screenType))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+    
     func submit(to endpoint: String, completion: @escaping (Result<String, Error>) -> Void) {
         let urlString = baseUrl + endpoint
         let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
