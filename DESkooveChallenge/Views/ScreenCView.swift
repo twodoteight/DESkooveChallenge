@@ -70,6 +70,7 @@ struct ScreenCView: View {
     }
     
     func wait(until time: DispatchTime) {
+        viewModel.hasTimeElapsed = false
         DispatchQueue.main.asyncAfter(deadline: time) {
             viewModel.hasTimeElapsed = true
             // Print to check if it works

@@ -11,65 +11,72 @@ struct ScreenAView: View {
     @EnvironmentObject var viewModel: ViewModel
     // For testing
     @ State private var canComeBack: Bool = false
-    
+    @ State private var isTestMode: Bool = true
+    @ State private var shouldCache: Bool = true
+
     var body: some View {
         ZStack {
             VStack (spacing: 30) {
                 Spacer()
-                // Unimportant view, mostly for testing.
-                //                Text(viewModel.nextBScreen?.rawValue ?? "Fetching Next View")
                 ProgressView("In Progress")
                     .progressViewStyle(CircularProgressViewStyle(tint: Color.black))
                     .font(.system(size:20))
                     .foregroundColor(.black)
                     .onAppear {
-                        viewModel.fetchBScreen()
+                        // For easier review
+                        if isTestMode == false {
+                            viewModel.fetchBScreen()
+                        }
                     }
-                // Temporary controls for debugging and testing.
-//                VStack {
-//                    Toggle("Want to navigate back here?", isOn: $canComeBack).padding([.leading, .trailing], 50)
-//
-//                }
-//                VStack {
-//
-//                    Button("Start fetching") {
-//                        viewModel.fetchBScreen()
-//                    }
-//                    .buttonStyle(.borderedProminent)
-//                    .foregroundColor(Color.black)
-//                    .accentColor(Color.black)
-//                    .frame(width: 300, height: 40, alignment: .bottomTrailing)
-//
-//                    Group {
-//                        Button("Select B1"){
-//                            viewModel.bScreen = .screenB1
-//                        }
-//
-//                        Button("Select B2"){
-//                            viewModel.bScreen = .screenB2
-//                        }
-//
-//                        Button("Select B3"){
-//                            viewModel.bScreen = .screenB3
-//                        }
-//
-//                        Button("Select No View"){
-//                            viewModel.bScreen = .noScreenB
-//                        }
-//
-//                    }
-//                    .buttonStyle(.bordered)
-//                    .foregroundColor(Color.black)
-//                    .frame(width: 300, height: 40, alignment: .bottomTrailing)
-//                }
-                
+                    .onChange(of: isTestMode) { newValue in
+                        if isTestMode == false {
+                        viewModel.fetchBScreen()
+                        }
+                    }
+                // Temporary controls for debugging and testing. Just uncomment
+                VStack {
+                    Toggle("Test mode", isOn: $isTestMode).padding([.leading, .trailing], 50)
+                    if isTestMode {
+                        Toggle("Want to navigate back here?", isOn: $canComeBack).padding([.leading, .trailing], 50)
+                        Toggle("Cache results?", isOn: $shouldCache).padding([.leading, .trailing], 50)
+                        VStack {
+                            Button("Fetch screen") {
+                                viewModel.fetchBScreen()
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .foregroundColor(Color.white)
+                            .accentColor(Color.black)
+                            .frame(width: 300, height: 40, alignment: .bottomTrailing)
+                            
+                            Group {
+                                Button("Select B1"){
+                                    viewModel.setBScreen(screenType: .screenB1, shouldCache: shouldCache)
+                                }
+                                
+                                Button("Select B2"){
+                                    viewModel.setBScreen(screenType: .screenB2, shouldCache: shouldCache)
+                                }
+                                
+                                Button("Select B3"){
+                                    viewModel.setBScreen(screenType: .screenB3, shouldCache: shouldCache)
+                                }
+                                
+                                Button("Select No View"){
+                                    viewModel.setBScreen(screenType: .noScreenB, shouldCache: shouldCache)
+                                }
+                            }
+                            .buttonStyle(.bordered)
+                            .foregroundColor(Color.black)
+                            .frame(width: 300, height: 40, alignment: .bottomTrailing)
+                        }
+                    }
+                }
                 Spacer()
             }
             .navigationTitle(ScreenType.screenA.rawValue)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.screenA)
             .ignoresSafeArea()
-            
             
             NavigationLink(destination: ScreenBView().navigationBarBackButtonHidden(!canComeBack), tag: ScreenType.screenB1, selection: $viewModel.bScreen) {
                 EmptyView()

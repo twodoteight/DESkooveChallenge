@@ -28,7 +28,7 @@ class ViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.isSelectionSubmitted)
         XCTAssertFalse(viewModel.canProceedToC)
         
-        viewModel.setBScreen(screenType: .screenB3)
+        viewModel.setBScreen(screenType: .screenB3, shouldCache: false)
         viewModel.submitSelection()
         
         XCTAssertFalse(viewModel.isSelectionSubmitted)

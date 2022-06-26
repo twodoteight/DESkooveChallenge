@@ -63,7 +63,7 @@ class ViewModel: NSObject, ObservableObject {
         // Check if a previouslt fethed result is persisted in UserDefaults.
         // Could be done within the ChallengeService class
         if cacheBScreen == true, let cachedScreen = getBScreenFromCache() {
-            setBScreen(screenType: cachedScreen)
+            setBScreen(screenType: cachedScreen, shouldCache: false)
             return
         }
             
@@ -71,8 +71,8 @@ class ViewModel: NSObject, ObservableObject {
         service.getBScreen(from: endpoint) { [weak self] (result: Result<ScreenType, Error>) in
             switch result {
             case .success(let screenType):
-                    UserDefaults.standard.set(screenType.rawValue, forKey: "rFetchExperiments")
-                    self?.setBScreen(screenType: screenType)
+                    //UserDefaults.standard.set(screenType.rawValue, forKey: "rFetchExperiments")
+                self?.setBScreen(screenType: screenType, shouldCache: true)
             case .failure(let error):
                 print("Could not get the next screen! \(error.localizedDescription)")
             }
@@ -100,17 +100,20 @@ class ViewModel: NSObject, ObservableObject {
         }
     }
     
+    func setBScreen(screenType: ScreenType, shouldCache: Bool = false) {
+        if shouldCache {
+            UserDefaults.standard.set(screenType.rawValue, forKey: "rFetchExperiments")
+        }
+        bScreen = screenType
+        fetchCScreen()
+    }
+    
     func getBScreenFromCache() -> ScreenType? {
         if let data = UserDefaults.standard.object(forKey: "rFetchExperiments") {
             print("Fetched screen type from cache")
             return ScreenType(rawValue: data as? String ?? "")
         }
         return nil
-    }
-    
-    func setBScreen(screenType: ScreenType) {
-        bScreen = screenType
-        fetchCScreen()
     }
     
     func fetchCScreen() {
