@@ -6,7 +6,9 @@ First destination view is determined with a network call that returns the next s
 
 <p align="center">
   <img src="nav_flow_example_1.gif" height="300">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="nav_flow_example_2.gif" height="300">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="nav_flow_example_3.gif" height="300">
 </p>
 
